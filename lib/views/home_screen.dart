@@ -13,6 +13,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   Map<String, dynamic>? paymentIntentData;
+ String _stripeSecretKey = 'sk_test_51MWauPBMN7f2KaatD7dcslVBw3YkT7Rme2n8tMcEyYVZ5XqDW3SP9D1Jwhp8HZDgfJMHcgW2DBNOCbrrOGHFrEao00nbRtoLQN';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,6 +61,26 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: const Center(
                   child: Text(
                     'Subscription',
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20,),
+            InkWell(
+              onTap: () async {
+                // final paymentMethod = await Stripe.instance.createPaymentMethod(
+                //     params: const PaymentMethodParams.card(
+                //         paymentMethodData: PaymentMethodData()));
+                await stripePayout();
+              },
+              child: Container(
+                height: 50,
+                width: 200,
+                color: Colors.green,
+                child: const Center(
+                  child: Text(
+                    'Payout',
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
                 ),
@@ -294,5 +316,38 @@ Future<Map<String, dynamic>> _createSubscriptions(String customerId) async {
     await _attachPaymentMethod(_paymentMethod['id'], _customer['id']);
     await _updateCustomer(_paymentMethod['id'], _customer['id']);
     await _createSubscriptions(_customer['id']);
+  }
+
+  stripePayout()async{
+    try{
+      Map<String, dynamic> payoutData = {
+  "amount": '100',
+  "currency": "USD",
+  "destination": "4242 4242 4242 4242"
+};
+
+var body = json.encode(payoutData);
+var response = await http.post(Uri.parse('https://api.stripe.com/v1/payouts'),
+  headers: {
+    'Authorization': 'Bearer $_stripeSecretKey',
+    'Content-Type': 'application/x-www-form-urlencoded'
+  },
+  body: payoutData
+);
+if (response.statusCode == 200) {
+  Map<String, dynamic> payoutResponse = json.decode(response.body);
+  print('payout Response -> ${payoutResponse.toString()}');
+  print('success Response -> ${response.body.toString()}');
+  // Handle successful payout
+} else {
+  print('unsuccess Response -> ${response.body.toString()}');
+  // Handle unsuccessful payout
+}
+
+    }catch(e){
+      print('error Response -> ${e.toString()}');
+    }
+    
+
   }
 }
