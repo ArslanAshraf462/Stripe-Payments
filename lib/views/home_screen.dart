@@ -14,6 +14,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   Map<String, dynamic>? paymentIntentData;
  String _stripeSecretKey = 'sk_test_51MWauPBMN7f2KaatD7dcslVBw3YkT7Rme2n8tMcEyYVZ5XqDW3SP9D1Jwhp8HZDgfJMHcgW2DBNOCbrrOGHFrEao00nbRtoLQN';
+ String? accountID;
 
   @override
   Widget build(BuildContext context) {
@@ -72,15 +73,75 @@ class _HomeScreenState extends State<HomeScreen> {
                 // final paymentMethod = await Stripe.instance.createPaymentMethod(
                 //     params: const PaymentMethodParams.card(
                 //         paymentMethodData: PaymentMethodData()));
-                await stripePayout();
+                await createExpressAccount();
               },
               child: Container(
                 height: 50,
-                width: 200,
+                width: 230,
                 color: Colors.green,
                 child: const Center(
                   child: Text(
-                    'Payout',
+                    'Create Express Account',
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20,),
+            InkWell(
+              onTap: () async {
+                // final paymentMethod = await Stripe.instance.createPaymentMethod(
+                //     params: const PaymentMethodParams.card(
+                //         paymentMethodData: PaymentMethodData()));
+                await getExpressAccount();
+              },
+              child: Container(
+                height: 50,
+                width: 230,
+                color: Colors.green,
+                child: const Center(
+                  child: Text(
+                    'Get Express Account',
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20,),
+            InkWell(
+              onTap: () async {
+                // final paymentMethod = await Stripe.instance.createPaymentMethod(
+                //     params: const PaymentMethodParams.card(
+                //         paymentMethodData: PaymentMethodData()));
+                await accountLinks();
+              },
+              child: Container(
+                height: 50,
+                width: 230,
+                color: Colors.green,
+                child: const Center(
+                  child: Text(
+                    'Link Account',
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20,),
+            InkWell(
+              onTap: () async {
+                // final paymentMethod = await Stripe.instance.createPaymentMethod(
+                //     params: const PaymentMethodParams.card(
+                //         paymentMethodData: PaymentMethodData()));
+                await payout();
+              },
+              child: Container(
+                height: 50,
+                width: 230,
+                color: Colors.green,
+                child: const Center(
+                  child: Text(
+                    'Transfer',
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
                 ),
@@ -350,4 +411,145 @@ if (response.statusCode == 200) {
     
 
   }
+
+  createExpressAccount() async{
+    try{
+      Map<String, dynamic> body = {
+        "type": 'express',
+        "country": "US",
+        "business_type": 'individual',
+        // "capabilities": {
+        //   "card_payments": {"requested": false},
+        //   "transfers": {"requested": true},
+        // },
+  };
+//var bodie = json.encode(body);
+  var response = await http.post(Uri.parse('https://api.stripe.com/v1/accounts'),
+  body: body,
+  headers: {
+    'Authorization': 'Bearer $_stripeSecretKey',
+    'Content-Type': 'application/x-www-form-urlencoded'
+  }
+  );
+  if (response.statusCode == 200) {
+  Map<String, dynamic> payoutResponse = json.decode(response.body);
+  print('payout Response -> ${payoutResponse.toString()}');
+  print('success Response -> ${response.body.toString()}');
+  print('success ID Response -> ${payoutResponse['id'].toString()}');
+  accountID = payoutResponse['id'].toString();
+  // Handle successful payout
+} else {
+  print('unsuccess Response -> ${response.body.toString()}');
+  // Handle unsuccessful payout
+}
+    }catch (e){
+      print('error Response -> ${e.toString()}');
+    }
+}
+getExpressAccount() async{
+    try{
+  
+  var response = await http.post(Uri.parse('https://api.stripe.com/v1/accounts/$accountID'),
+  headers: {
+    'Authorization': 'Bearer $_stripeSecretKey',
+    'Content-Type': 'application/x-www-form-urlencoded'
+  }
+  );
+  if (response.statusCode == 200) {
+  Map<String, dynamic> payoutResponse = json.decode(response.body);
+ // print('payout Response -> ${payoutResponse.toString()}');
+  print('success Response -> ${response.body.toString()}');
+  // Handle successful payout
+} else {
+  print('unsuccess Response -> ${response.body.toString()}');
+  // Handle unsuccessful payout
+}
+    }catch (e){
+      print('error Response -> ${e.toString()}');
+    }
+}
+
+accountLinks() async{
+    try{
+ var body = {
+      "account": accountID,
+      "refresh_url": 'https://api.stripe.com/',
+      "return_url": "https://oraxtech.com/",
+      "type": 'account_onboarding',
+    };
+  var response = await http.post(Uri.parse('https://api.stripe.com/v1/account_links'),
+  body: body,
+  headers: {
+    'Authorization': 'Bearer $_stripeSecretKey',
+    'Content-Type': 'application/x-www-form-urlencoded'
+  }
+  );
+  if (response.statusCode == 200) {
+  Map<String, dynamic> payoutResponse = json.decode(response.body);
+ // print('payout Response -> ${payoutResponse.toString()}');
+  print('success link Response -> ${response.body.toString()}');
+  // Handle successful payout
+} else {
+  print('unsuccess link Response -> ${response.body.toString()}');
+  // Handle unsuccessful payout
+}
+    }catch (e){
+      print('error link Response -> ${e.toString()}');
+    }
+}
+
+transfer()async{
+  try{
+ var body = {
+      "amount": '20',
+      "currency": 'usd',
+      "destination": accountID,
+    };
+  var response = await http.post(Uri.parse('https://api.stripe.com/v1/transfers'),
+  body: body,
+  headers: {
+    'Authorization': 'Bearer $_stripeSecretKey',
+    'Content-Type': 'application/x-www-form-urlencoded'
+  }
+  );
+  if (response.statusCode == 200) {
+  Map<String, dynamic> payoutResponse = json.decode(response.body);
+ // print('payout Response -> ${payoutResponse.toString()}');
+  print('success link Response -> ${response.body.toString()}');
+  // Handle successful payout
+} else {
+  print('unsuccess link Response -> ${response.body.toString()}');
+  // Handle unsuccessful payout
+}
+    }catch (e){
+      print('error link Response -> ${e.toString()}');
+    }
+}
+
+payout() async{
+  try{
+ var body = {
+      "amount": '20',
+      "currency": 'usd',
+    };
+  var response = await http.post(Uri.parse('https://api.stripe.com/v1/payouts'),
+  body: body,
+  headers: {
+    'Authorization': 'Bearer $_stripeSecretKey',
+    'Content-Type': 'application/x-www-form-urlencoded'
+  }
+  );
+  if (response.statusCode == 200) {
+  Map<String, dynamic> payoutResponse = json.decode(response.body);
+ // print('payout Response -> ${payoutResponse.toString()}');
+  print('success link Response -> ${response.body.toString()}');
+  // Handle successful payout
+} else {
+  print('unsuccess link Response -> ${response.body.toString()}');
+  // Handle unsuccessful payout
+}
+    }catch (e){
+      print('error link Response -> ${e.toString()}');
+    }
+}
 }
