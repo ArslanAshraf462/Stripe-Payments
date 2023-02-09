@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:isolate';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -133,7 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 // final paymentMethod = await Stripe.instance.createPaymentMethod(
                 //     params: const PaymentMethodParams.card(
                 //         paymentMethodData: PaymentMethodData()));
-                await payout();
+                await transfer();
               },
               child: Container(
                 height: 50,
@@ -415,13 +416,17 @@ if (response.statusCode == 200) {
   createExpressAccount() async{
     try{
       Map<String, dynamic> body = {
-        "type": 'express',
+        "type": 'custom',
         "country": "US",
         "business_type": 'individual',
-        // "capabilities": {
-        //   "card_payments": {"requested": false},
-        //   "transfers": {"requested": true},
-        // },
+        'email': 'jenny.rosen@example.com',
+  // 'capabilities': {
+  //   'card_payments': {'requested': true},
+  //   'transfers': {'requested': true},
+  // },
+        "capabilities[transfers][requested]": 'true',
+
+        // "capabilities[card_payments][requested]": 'false'
   };
 //var bodie = json.encode(body);
   var response = await http.post(Uri.parse('https://api.stripe.com/v1/accounts'),
@@ -440,6 +445,44 @@ if (response.statusCode == 200) {
   // Handle successful payout
 } else {
   print('unsuccess Response -> ${response.body.toString()}');
+  // Handle unsuccessful payout
+}
+    }catch (e){
+      print('error Response -> ${e.toString()}');
+    }
+}
+capabilities()async{
+  try{
+      Map<String, dynamic> body = {
+        // "type": 'custom',
+        // "country": "US",
+        // "business_type": 'individual',
+        // 'email': 'jenny.rosen@example.com',
+  // 'capabilities': {
+  //   'card_payments': {'requested': true},
+  //   'transfers': {'requested': true},
+  // },
+        "requested": 'true',
+
+        // "capabilities[card_payments][requested]": 'false'
+  };
+//var bodie = json.encode(body);
+  var response = await http.post(Uri.parse('https://api.stripe.com/v1/accounts/$accountID/capabilities/transfers'),
+  body: body,
+  headers: {
+    'Authorization': 'Bearer $_stripeSecretKey',
+    'Content-Type': 'application/x-www-form-urlencoded'
+  }
+  );
+  if (response.statusCode == 200) {
+  Map<String, dynamic> payoutResponse = json.decode(response.body);
+  print('capability Response -> ${payoutResponse.toString()}');
+  print('capability Response -> ${response.body.toString()}');
+  print('capability ID Response -> ${payoutResponse['id'].toString()}');
+  accountID = payoutResponse['id'].toString();
+  // Handle successful payout
+} else {
+  print('capability unsuccess Response -> ${response.body.toString()}');
   // Handle unsuccessful payout
 }
     }catch (e){
@@ -500,6 +543,7 @@ accountLinks() async{
 
 transfer()async{
   try{
+    await capabilities();
  var body = {
       "amount": '20',
       "currency": 'usd',
@@ -509,20 +553,20 @@ transfer()async{
   body: body,
   headers: {
     'Authorization': 'Bearer $_stripeSecretKey',
-    'Content-Type': 'application/x-www-form-urlencoded'
+    'Content-Type': 'application/x-www-form-urlencoded',
   }
   );
   if (response.statusCode == 200) {
   Map<String, dynamic> payoutResponse = json.decode(response.body);
  // print('payout Response -> ${payoutResponse.toString()}');
-  print('success link Response -> ${response.body.toString()}');
+  print('success transfer Response -> ${response.body.toString()}');
   // Handle successful payout
 } else {
-  print('unsuccess link Response -> ${response.body.toString()}');
+  print('unsuccess transfer Response -> ${response.body.toString()}');
   // Handle unsuccessful payout
 }
     }catch (e){
-      print('error link Response -> ${e.toString()}');
+      print('error transfer Response -> ${e.toString()}');
     }
 }
 
@@ -531,25 +575,27 @@ payout() async{
  var body = {
       "amount": '20',
       "currency": 'usd',
+      //"destination": accountID
     };
   var response = await http.post(Uri.parse('https://api.stripe.com/v1/payouts'),
   body: body,
   headers: {
     'Authorization': 'Bearer $_stripeSecretKey',
-    'Content-Type': 'application/x-www-form-urlencoded'
+    'Content-Type': 'application/x-www-form-urlencoded',
+    "Stripe-Account": '4242424242424242'
   }
   );
   if (response.statusCode == 200) {
   Map<String, dynamic> payoutResponse = json.decode(response.body);
  // print('payout Response -> ${payoutResponse.toString()}');
-  print('success link Response -> ${response.body.toString()}');
+  print('success payout Response -> ${response.body.toString()}');
   // Handle successful payout
 } else {
-  print('unsuccess link Response -> ${response.body.toString()}');
+  print('unsuccess payout Response -> ${response.body.toString()}');
   // Handle unsuccessful payout
 }
     }catch (e){
-      print('error link Response -> ${e.toString()}');
+      print('error payout Response -> ${e.toString()}');
     }
 }
 }
