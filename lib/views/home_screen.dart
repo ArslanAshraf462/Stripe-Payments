@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'dart:isolate';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_stripe/flutter_stripe.dart';
@@ -83,9 +81,6 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 20,),
             InkWell(
               onTap: () async {
-                // final paymentMethod = await Stripe.instance.createPaymentMethod(
-                //     params: const PaymentMethodParams.card(
-                //         paymentMethodData: PaymentMethodData()));
                 await createExpressAccount();
               },
               child: Container(
@@ -103,9 +98,6 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 20,),
             InkWell(
               onTap: () async {
-                // final paymentMethod = await Stripe.instance.createPaymentMethod(
-                //     params: const PaymentMethodParams.card(
-                //         paymentMethodData: PaymentMethodData()));
                 await getExpressAccount();
               },
               child: Container(
@@ -123,9 +115,6 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 20,),
             InkWell(
               onTap: () async {
-                // final paymentMethod = await Stripe.instance.createPaymentMethod(
-                //     params: const PaymentMethodParams.card(
-                //         paymentMethodData: PaymentMethodData()));
                 await accountLinks();
               },
               child: Container(
@@ -143,9 +132,6 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 20,),
             InkWell(
               onTap: () async {
-                // final paymentMethod = await Stripe.instance.createPaymentMethod(
-                //     params: const PaymentMethodParams.card(
-                //         paymentMethodData: PaymentMethodData()));
                 await transfer();
               },
               child: Container(
@@ -165,9 +151,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             InkWell(
               onTap: () async {
-                // final paymentMethod = await Stripe.instance.createPaymentMethod(
-                //     params: const PaymentMethodParams.card(
-                //         paymentMethodData: PaymentMethodData()));
                 await payout();
               },
               child: Container(
@@ -414,39 +397,6 @@ Future<Map<String, dynamic>> _createSubscriptions(String customerId) async {
     await _createSubscriptions(_customer['id']);
   }
 
-//   stripePayout()async{
-//     try{
-//       Map<String, dynamic> payoutData = {
-//   "amount": '100',
-//   "currency": "USD",
-//   "destination": "4242 4242 4242 4242"
-// };
-
-// var body = json.encode(payoutData);
-// var response = await http.post(Uri.parse('https://api.stripe.com/v1/payouts'),
-//   headers: {
-//     'Authorization': 'Bearer $_stripeSecretKey',
-//     'Content-Type': 'application/x-www-form-urlencoded'
-//   },
-//   body: payoutData
-// );
-// if (response.statusCode == 200) {
-//   Map<String, dynamic> payoutResponse = json.decode(response.body);
-//   print('payout Response -> ${payoutResponse.toString()}');
-//   print('success Response -> ${response.body.toString()}');
-//   // Handle successful payout
-// } else {
-//   print('unsuccess Response -> ${response.body.toString()}');
-//   // Handle unsuccessful payout
-// }
-
-//     }catch(e){
-//       print('error Response -> ${e.toString()}');
-//     }
-    
-
-//   }
-
   createExpressAccount() async{
     try{
     var body = {
@@ -487,44 +437,7 @@ Future<Map<String, dynamic>> _createSubscriptions(String customerId) async {
       print('error Response -> ${e.toString()}');
     }
 }
-// capabilities()async{
-//   try{
-//       Map<String, dynamic> body = {
-//         // "type": 'custom',
-//         // "country": "US",
-//         // "business_type": 'individual',
-//         // 'email': 'jenny.rosen@example.com',
-//   // 'capabilities': {
-//   //   'card_payments': {'requested': true},
-//   //   'transfers': {'requested': true},
-//   // },
-//         "requested": 'true',
 
-//         // "capabilities[card_payments][requested]": 'false'
-//   };
-// //var bodie = json.encode(body);
-//   var response = await http.post(Uri.parse('https://api.stripe.com/v1/accounts/$accountID/capabilities/transfers'),
-//   body: body,
-//   headers: {
-//     'Authorization': 'Bearer $_stripeSecretKey',
-//     'Content-Type': 'application/x-www-form-urlencoded'
-//   }
-//   );
-//   if (response.statusCode == 200) {
-//   Map<String, dynamic> payoutResponse = json.decode(response.body);
-//   print('capability Response -> ${payoutResponse.toString()}');
-//   print('capability Response -> ${response.body.toString()}');
-//   print('capability ID Response -> ${payoutResponse['id'].toString()}');
-//   accountID = payoutResponse['id'].toString();
-//   // Handle successful payout
-// } else {
-//   print('capability unsuccess Response -> ${response.body.toString()}');
-//   // Handle unsuccessful payout
-// }
-//     }catch (e){
-//       print('error Response -> ${e.toString()}');
-//     }
-// }
 getExpressAccount() async{
     try{
   String? accountID1 = await getAccountId();
