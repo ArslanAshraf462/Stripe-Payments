@@ -378,7 +378,7 @@ Future<Map<String, dynamic>> _createSubscriptions(String customerId) async {
             'Content-Type': 'application/x-www-form-urlencoded'
           },
       body: {
-        'description': 'Ali'
+        'description': 'Arslan'
       },
     );
     if (response.statusCode == 200) {
@@ -421,7 +421,17 @@ Future<Map<String, dynamic>> _createSubscriptions(String customerId) async {
     'Content-Type': 'application/x-www-form-urlencoded'
   }
   );
+  
   if (response.statusCode == 200) {
+    Future.delayed(const Duration(seconds: 1),
+    () {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text("Express account created successfully"),
+              duration: Duration(seconds: 3),
+            ));
+    },
+    );
+    
   Map<String, dynamic> payoutResponse = json.decode(response.body);
   print('payout Response -> ${payoutResponse.toString()}');
   print('success Response -> ${response.body.toString()}');
@@ -448,6 +458,15 @@ getExpressAccount() async{
   }
   );
   if (response.statusCode == 200) {
+    Future.delayed(
+          const Duration(seconds: 1),
+          () {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text("Get the Express account created successfully"),
+              duration: Duration(seconds: 3),
+            ));
+          },
+        );
   Map<String, dynamic> payoutResponse = json.decode(response.body);
  // print('payout Response -> ${payoutResponse.toString()}');
   print('success Response -> ${response.body.toString()}');
@@ -478,6 +497,15 @@ accountLinks() async{
   }
   );
   if (response.statusCode == 200) {
+    Future.delayed(
+          const Duration(seconds: 1),
+          () {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text("Express account created successfully"),
+              duration: Duration(seconds: 3),
+            ));
+          },
+        );
   Map<String, dynamic> payoutResponse = json.decode(response.body);
   Navigator.of(context).push(MaterialPageRoute(builder: (context){
     return DashBoardScreen(accountLink: payoutResponse['url'].toString());
@@ -511,6 +539,15 @@ transfer()async{
   }
   );
   if (response.statusCode == 200) {
+    Future.delayed(
+          const Duration(seconds: 1),
+          () {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text("Transfer done successfully"),
+              duration: Duration(seconds: 3),
+            ));
+          },
+        );
   Map<String, dynamic> payoutResponse = json.decode(response.body);
  // print('payout Response -> ${payoutResponse.toString()}');
   print('success transfer Response -> ${response.body.toString()}');
@@ -542,6 +579,15 @@ payout() async{
   );
   if (response.statusCode == 200) {
   Map<String, dynamic> payoutResponse = json.decode(response.body);
+  Future.delayed(
+          const Duration(seconds: 1),
+          () {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text("Payout successfully"),
+              duration: Duration(seconds: 3),
+            ));
+          },
+        );
  // print('payout Response -> ${payoutResponse.toString()}');
   print('success payout Response -> ${response.body.toString()}');
   // Handle successful payout
